@@ -22,7 +22,7 @@ android {
 }
 
 dependencies {
-    implementation project(':Library')
+    implementation project(':PLChipGroup')
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'

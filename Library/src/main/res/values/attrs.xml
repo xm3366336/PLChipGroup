@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="PLChipGroup">
+
+        <!-- 以下是官方的，原封不动 -->
+        <!-- 横向间距 -->
+        <attr name="chipSpacingHorizontal" format="dimension" />
+        <!-- 竖向间距 -->
+        <attr name="chipSpacingVertical" format="dimension" />
+        <!-- 是否单行模式，默认false。如果设置为true，则包在HorizontalScrollView里面 -->
+        <attr name="singleLine" format="boolean" />
+        <!-- 单选模式，默认false -->
+        <attr name="singleSelection" format="boolean" />
+        <!-- 不允许取消，默认false -->
+        <attr name="selectionRequired" format="boolean" />
+
+        <!-- 以下自定义的 -->
+        <!-- 最多显示多少条，默认0，小于=0时，不限制。如果超过xx条，则显示：收缩和展开 -->
+        <attr name="maxCount" format="integer" />
+
+        <!-- chip的高度，默认24dip -->
+        <attr name="chipHeight" format="dimension" />
+
+    </declare-styleable>
+
+</resources>

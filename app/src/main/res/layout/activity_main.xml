@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.pengl.demo.MainActivity">
+
+    <com.pengl.PLChipGroup
+        android:id="@+id/mPLChipGroup1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dip"
+        app:chipHeight="24dip"
+        app:chipSpacingHorizontal="8dip"
+        app:chipSpacingVertical="8dip"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:maxCount="5"
+        app:selectionRequired="true"
+        app:singleSelection="false" />
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/mCheckBox_single"
+        android:layout_width="0dip"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dip"
+        android:layout_marginTop="32dip"
+        android:layout_marginEnd="16dip"
+        android:text="单选模式"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/mPLChipGroup1" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_show"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dip"
+        android:text="显示所选的项"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+</androidx.constraintlayout.widget.ConstraintLayout>

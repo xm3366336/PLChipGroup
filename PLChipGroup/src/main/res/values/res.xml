@@ -2,16 +2,16 @@
 <resources>
 
     <!-- 选中状态下的边框颜色 -->
-    <color name="pl_chipgroup_color_stroke">#ffff7043</color>
+    <color name="plcg_default_color_stroke">#ffff7043</color>
     <!-- 未选中状态下的边框颜色 -->
-    <color name="pl_chipgroup_color_stroke_un">#999999</color>
+    <color name="plcg_default_color_stroke_un">#999999</color>
     <!-- 选中状态下的文字颜色 -->
-    <color name="pl_chipgroup_color_text">#ffffff</color>
+    <color name="plcg_default_color_text">#ffffff</color>
     <!-- 未选中状态下的文字颜色 -->
-    <color name="pl_chipgroup_color_text_un">#999999</color>
+    <color name="plcg_default_color_text_un">#999999</color>
     <!-- 选中后的背景颜色 -->
-    <color name="pl_chipgroup_color_bg">#aaff7043</color>
-    <!-- 未选中状态的背景颜色   -->
-    <color name="pl_chipgroup_color_bg_un">#f3f7f9</color>
+    <color name="plcg_default_color_bg">#aaff7043</color>
+    <!-- 未选中状态的背景颜色 -->
+    <color name="plcg_default_color_bg_un">#f3f7f9</color>
 
 </resources>

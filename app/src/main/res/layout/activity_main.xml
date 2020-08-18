@@ -11,13 +11,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="16dip"
-        app:chipHeight="24dip"
         app:chipSpacingHorizontal="8dip"
         app:chipSpacingVertical="8dip"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:maxCount="5"
+        app:plcg_height="24dip"
+        app:plcg_maxCount="5"
+        app:plcg_textSize="14dp"
         app:selectionRequired="true"
         app:singleSelection="false" />
 

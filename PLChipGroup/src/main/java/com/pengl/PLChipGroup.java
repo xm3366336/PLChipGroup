@@ -2,7 +2,9 @@ package com.pengl;
 
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.text.TextUtils;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,10 +21,13 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 
+import androidx.annotation.ColorRes;
 import androidx.annotation.Dimension;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 public class PLChipGroup extends ConstraintLayout {
+
+    private final String TAG = PLChipGroup.class.getSimpleName();
 
     private Context mContext;
     private ChipGroup mChipGroup;
@@ -39,6 +44,20 @@ public class PLChipGroup extends ConstraintLayout {
     private final int _def_expand_id = -10002;
 
     private int mChipHeight;// Chip的高度
+    private float mTextSize;// 字体大小
+
+    @ColorRes
+    private int plcg_color_stroke;
+    @ColorRes
+    private int plcg_color_stroke_un;
+    @ColorRes
+    private int plcg_color_text;
+    @ColorRes
+    private int plcg_color_text_un;
+    @ColorRes
+    private int plcg_color_bg;
+    @ColorRes
+    private int plcg_color_bg_un;
 
     /**
      * 已选中的id
@@ -76,13 +95,21 @@ public class PLChipGroup extends ConstraintLayout {
         if (null != attrs && null != mContext) {
             TypedArray a = mContext.obtainStyledAttributes(attrs, R.styleable.PLChipGroup);
 
-            setChipHeight(a.getDimensionPixelSize(R.styleable.PLChipGroup_chipHeight, dp2px(24)));
+            setChipHeight(a.getDimensionPixelSize(R.styleable.PLChipGroup_plcg_height, dp2px(24)));
             setChipSpacingHorizontal(a.getDimensionPixelOffset(R.styleable.PLChipGroup_chipSpacingHorizontal, 0));
             setChipSpacingVertical(a.getDimensionPixelOffset(R.styleable.PLChipGroup_chipSpacingVertical, 0));
             setSingleLine(a.getBoolean(R.styleable.PLChipGroup_singleLine, false));
             setSingleSelection(a.getBoolean(R.styleable.PLChipGroup_singleSelection, false));
             setSelectionRequired(a.getBoolean(R.styleable.PLChipGroup_selectionRequired, false));
-            setMaxCount(a.getInteger(R.styleable.PLChipGroup_maxCount, -1));
+            setMaxCount(a.getInteger(R.styleable.PLChipGroup_plcg_maxCount, -1));
+            setTextSize(a.getDimension(R.styleable.PLChipGroup_plcg_textSize, dp2px(12)));
+
+            setColorStroke(a.getInt(R.styleable.PLChipGroup_plcg_color_stroke, R.color.plcg_default_color_stroke));
+            setColorStrokeUn(a.getInt(R.styleable.PLChipGroup_plcg_color_stroke_un, R.color.plcg_default_color_stroke_un));
+            setColorText(a.getInt(R.styleable.PLChipGroup_plcg_color_stroke, R.color.plcg_default_color_text));
+            setColorTextUn(a.getInt(R.styleable.PLChipGroup_plcg_color_stroke_un, R.color.plcg_default_color_text_un));
+            setColorBg(a.getInt(R.styleable.PLChipGroup_plcg_color_stroke, R.color.plcg_default_color_bg));
+            setColorBgUn(a.getInt(R.styleable.PLChipGroup_plcg_color_stroke_un, R.color.plcg_default_color_bg_un));
 
             a.recycle();
         }
@@ -127,6 +154,72 @@ public class PLChipGroup extends ConstraintLayout {
     }
 
     /**
+     * 设置字体的大小
+     *
+     * @param textSize 字体大小
+     */
+    public void setTextSize(float textSize) {
+        this.mTextSize = textSize;
+    }
+
+    public void setColorStroke(@ColorRes int plcg_color_stroke) {
+        this.plcg_color_stroke = plcg_color_stroke;
+    }
+
+    public void setColorStrokeUn(@ColorRes int plcg_color_stroke_un) {
+        this.plcg_color_stroke_un = plcg_color_stroke_un;
+    }
+
+    public void setColorText(@ColorRes int plcg_color_text) {
+        this.plcg_color_text = plcg_color_text;
+    }
+
+    public void setColorTextUn(@ColorRes int plcg_color_text_un) {
+        this.plcg_color_text_un = plcg_color_text_un;
+    }
+
+    public void setColorBg(@ColorRes int plcg_color_bg) {
+        this.plcg_color_bg = plcg_color_bg;
+    }
+
+    public void setColorBgUn(@ColorRes int plcg_color_bg_un) {
+        this.plcg_color_bg_un = plcg_color_bg_un;
+    }
+
+    /**
+     * 默认选中的ids
+     *
+     * @param defaultCheckIds 默认选中的id，多个以逗号分隔。默认0，即第1个
+     */
+    public void setDefaultCheckIds(String defaultCheckIds) {
+        if (null == DATA || DATA.length <= 0) {
+            Log.e(TAG + ".setDefaultCheckIds", "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            Log.e(TAG + ".setDefaultCheckIds", "!!!!!!!!请先调用.setData方法传入数据!!!!!!!!");
+            Log.e(TAG + ".setDefaultCheckIds", "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            return;
+        }
+
+        checkIds = new LinkedHashSet<>();
+
+        if (TextUtils.isEmpty(defaultCheckIds)) {
+            checkIds.add(0);
+            return;
+        }
+
+        String[] items = defaultCheckIds.split(",");
+        for (String item : items) {
+            int x = -1;
+            try {
+                x = Integer.parseInt(item);
+            } catch (Exception ignored) {
+            }
+            if (x != -1 && x < DATA.length) {
+                checkIds.add(x);
+            }
+        }
+    }
+
+    /**
      * 设置要显示的数据
      *
      * @param data 数据
@@ -148,6 +241,13 @@ public class PLChipGroup extends ConstraintLayout {
      * 显示，默认以收缩状态显示
      */
     public void show() {
+        if (null == DATA || DATA.length <= 0) {
+            Log.e(TAG + ".show", "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            Log.e(TAG + ".show", "!!!!!!!!请先调用.setData方法传入数据!!!!!!!!");
+            Log.e(TAG + ".show", "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            return;
+        }
+
         showShrink();
     }
 
@@ -205,7 +305,7 @@ public class PLChipGroup extends ConstraintLayout {
 
         mChip.setId(id);// id以位置记录
         mChip.setText(text);
-        mChip.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 12);
+        mChip.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
         mChip.setPadding(dp2px(6), 0, dp2px(6), 0);
         mChip.setTextAlignment(TEXT_ALIGNMENT_CENTER);
         mChip.setShapeAppearanceModel(ShapeAppearanceModel.builder().setAllCornerSizes(mChipHeight / 2.0f).build());
@@ -263,7 +363,9 @@ public class PLChipGroup extends ConstraintLayout {
                         checkIds = new LinkedHashSet<>();
                         checkIds.add(id);
                         setChipStatus(mChip, true);
-                        mOnChipCheckListener.onClick(PLChipGroup.this, id, text);
+
+                        if (null != mOnChipCheckListener)
+                            mOnChipCheckListener.onClick(PLChipGroup.this, id, text);
                     }
                 });
             } else {
@@ -276,7 +378,8 @@ public class PLChipGroup extends ConstraintLayout {
 
                         if (isCheck) {
                             checkIds.add(id);
-                            mOnChipCheckListener.onClick(PLChipGroup.this, id, text);
+                            if (null != mOnChipCheckListener)
+                                mOnChipCheckListener.onClick(PLChipGroup.this, id, text);
                         } else {
                             checkIds.remove(id);
                         }
@@ -303,13 +406,13 @@ public class PLChipGroup extends ConstraintLayout {
      */
     private void setChipStatus(Chip mChip, boolean isCheckable) {
         if (isCheckable) {
-            mChip.setTextColor(getResources().getColor(R.color.pl_chipgroup_color_text));
-            mChip.setChipBackgroundColorResource(R.color.pl_chipgroup_color_bg);
-            mChip.setChipStrokeColorResource(R.color.pl_chipgroup_color_stroke);
+            mChip.setTextColor(getResources().getColor(plcg_color_text));
+            mChip.setChipBackgroundColorResource(plcg_color_bg);
+            mChip.setChipStrokeColorResource(plcg_color_stroke);
         } else {
-            mChip.setTextColor(getResources().getColor(R.color.pl_chipgroup_color_text_un));
-            mChip.setChipBackgroundColorResource(R.color.pl_chipgroup_color_bg_un);
-            mChip.setChipStrokeColorResource(R.color.pl_chipgroup_color_stroke_un);
+            mChip.setTextColor(getResources().getColor(plcg_color_text_un));
+            mChip.setChipBackgroundColorResource(plcg_color_bg_un);
+            mChip.setChipStrokeColorResource(plcg_color_stroke_un);
         }
     }
 

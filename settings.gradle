@@ -1,3 +1,2 @@
 include ':PLChipGroup'
 include ':app'
-rootProject.name = "library-PLChipGroup"

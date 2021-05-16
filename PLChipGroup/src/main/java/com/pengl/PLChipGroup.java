@@ -234,7 +234,7 @@ public class PLChipGroup extends FrameLayout {
     /**
      * 清空所有选项
      */
-    public void cleanChoose() {
+    public void cleanAll() {
         if (null == Chips) {
             return;
         }
@@ -245,6 +245,51 @@ public class PLChipGroup extends FrameLayout {
 
         checkIds = new LinkedHashSet<>();
         mChipGroup.clearCheck();
+    }
+
+    /**
+     * 全选，只有多选的情况下，才支持全选
+     */
+    public void setChooseAll() {
+        if (null == Chips) {
+            return;
+        }
+
+        if (isSingleSelection()) {
+            return;
+        }
+
+        checkIds = new LinkedHashSet<>();
+        boolean isNeedShowShrinkAndExpand = maxCount > 0 && maxCount < DATA.length;
+        if (isNeedShowShrinkAndExpand) {
+            showExpand();
+        }
+
+        for (Map.Entry<Integer, Chip> entry : Chips.entrySet()) {
+            if (entry.getKey() == _def_shrink_id || entry.getKey() == _def_expand_id) {
+                continue;
+            }
+            setChipStatus(entry.getValue(), true);
+            checkIds.add(entry.getKey());
+        }
+    }
+
+    /**
+     * 设置指定的Chip的勾选
+     *
+     * @param position 位置
+     * @param isCheck  是否选择
+     */
+    public void setChoose(int position, boolean isCheck) {
+        if (null == Chips) {
+            return;
+        }
+
+        if (!Chips.containsKey(position)) {
+            return;
+        }
+
+        setChipStatus(Chips.get(position), isCheck);
     }
 
     /**

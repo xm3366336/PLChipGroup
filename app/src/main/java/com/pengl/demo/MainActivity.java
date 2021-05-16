@@ -40,6 +40,8 @@ public class MainActivity extends AppCompatActivity {
 
         findViewById(R.id.btn_show).setOnClickListener(view -> Toast.makeText(MainActivity.this, mPLChipGroup.getCheckedValuesToString(), Toast.LENGTH_LONG).show());
 
-        findViewById(R.id.btn_clean).setOnClickListener(v -> mPLChipGroup.cleanChoose());
+        findViewById(R.id.btn_choose_all).setOnClickListener(v -> mPLChipGroup.setChooseAll());
+        findViewById(R.id.btn_clean_all).setOnClickListener(v -> mPLChipGroup.cleanAll());
+        findViewById(R.id.btn_clean_id).setOnClickListener(v -> mPLChipGroup.setChoose(0, false));
     }
 }

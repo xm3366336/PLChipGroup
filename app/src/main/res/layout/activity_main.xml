@@ -45,13 +45,32 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_clean"
+        android:id="@+id/btn_clean_all"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="16dip"
         android:layout_marginBottom="16dip"
-        android:text="清空"
+        android:text="清空所有"
         app:layout_constraintEnd_toStartOf="@id/btn_show"
         app:layout_constraintTop_toTopOf="@id/btn_show" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_clean_id"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dip"
+        android:layout_marginBottom="16dip"
+        android:text="清除指定"
+        app:layout_constraintStart_toEndOf="@id/btn_show"
+        app:layout_constraintTop_toTopOf="@id/btn_show" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_choose_all"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dip"
+        android:text="选择全部"
+        app:layout_constraintBottom_toTopOf="@id/btn_show"
+        app:layout_constraintStart_toEndOf="@id/btn_show" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

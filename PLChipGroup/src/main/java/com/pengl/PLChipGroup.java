@@ -9,6 +9,7 @@ import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
+import android.widget.FrameLayout;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipDrawable;
@@ -20,16 +21,16 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 
 import androidx.annotation.ColorRes;
 import androidx.annotation.Dimension;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-public class PLChipGroup extends ConstraintLayout {
+public class PLChipGroup extends FrameLayout {
 
     private final String TAG = PLChipGroup.class.getSimpleName();
 
-    private Context mContext;
     private ChipGroup mChipGroup;
     private OnChipCheckListener mOnChipCheckListener;
 
@@ -72,28 +73,25 @@ public class PLChipGroup extends ConstraintLayout {
 
     public PLChipGroup(Context context) {
         super(context);
-        this.mContext = context;
         init(null);
     }
 
     public PLChipGroup(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.mContext = context;
         init(attrs);
     }
 
     public PLChipGroup(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        this.mContext = context;
         init(attrs);
     }
 
     public void init(AttributeSet attrs) {
-        View.inflate(mContext, R.layout.pl_view_chipgroup, this);
-        mChipGroup = findViewById(R.id.mChipGroup);
+        mChipGroup = new ChipGroup(getContext());
+        addView(mChipGroup, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 
-        if (null != attrs && null != mContext) {
-            TypedArray a = mContext.obtainStyledAttributes(attrs, R.styleable.PLChipGroup);
+        if (null != attrs && null != getContext()) {
+            TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.PLChipGroup);
 
             setChipHeight(a.getDimensionPixelSize(R.styleable.PLChipGroup_plcg_height, dp2px(24)));
             setChipSpacingHorizontal(a.getDimensionPixelOffset(R.styleable.PLChipGroup_chipSpacingHorizontal, 0));
@@ -136,6 +134,11 @@ public class PLChipGroup extends ConstraintLayout {
         mChipGroup.setSingleLine(singleLine);
     }
 
+    /**
+     * 设置选择模式
+     *
+     * @param singleSelection true单选模式，false多选模式
+     */
     public void setSingleSelection(boolean singleSelection) {
         mChipGroup.setSingleSelection(singleSelection);
     }
@@ -229,6 +232,22 @@ public class PLChipGroup extends ConstraintLayout {
     }
 
     /**
+     * 清空所有选项
+     */
+    public void cleanChoose() {
+        if (null == Chips) {
+            return;
+        }
+
+        for (Map.Entry<Integer, Chip> entry : Chips.entrySet()) {
+            setChipStatus(entry.getValue(), false);
+        }
+
+        checkIds = new LinkedHashSet<>();
+        mChipGroup.clearCheck();
+    }
+
+    /**
      * 点击Chip的监听
      *
      * @param mOnChipCheckListener 监听
@@ -299,8 +318,8 @@ public class PLChipGroup extends ConstraintLayout {
      * @return Chip
      */
     private Chip createChip(final int id, final String text) {
-        final Chip mChip = new Chip(mContext);
-        ChipDrawable chipDrawable = ChipDrawable.createFromAttributes(mContext, null, 0, R.style.Widget_MaterialComponents_Chip_Choice);
+        final Chip mChip = new Chip(getContext());
+        ChipDrawable chipDrawable = ChipDrawable.createFromAttributes(getContext(), null, 0, R.style.Widget_MaterialComponents_Chip_Choice);
         mChip.setChipDrawable(chipDrawable);
 
         mChip.setId(id);// id以位置记录
@@ -317,75 +336,49 @@ public class PLChipGroup extends ConstraintLayout {
         if (id == _def_shrink_id) {
             mChip.setCloseIconVisible(true);
             mChip.setCloseIconResource(R.drawable.ic_arrow_drop_down_24dp);
-            mChip.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    showExpand();
-                }
-            });
-            mChip.setOnCloseIconClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    showExpand();
-                }
-            });
+            mChip.setOnClickListener(view -> showExpand());
+            mChip.setOnCloseIconClickListener(view -> showExpand());
         } else if (id == _def_expand_id) {
             mChip.setCloseIconVisible(true);
             mChip.setCloseIconResource(R.drawable.ic_arrow_drop_up_24dp);
-            mChip.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    showShrink();
-                }
-            });
-            mChip.setOnCloseIconClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    showShrink();
-                }
-            });
+            mChip.setOnClickListener(view -> showShrink());
+            mChip.setOnCloseIconClickListener(view -> showShrink());
         } else {
             if (isSingleSelection()) {
-                mChip.setOnClickListener(new OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        if (null != checkIds && checkIds.size() >= 1) {
-                            for (int old_id : checkIds) {
-                                if (Chips.containsKey(old_id)) {
-                                    Chip c = Chips.get(old_id);
-                                    if (null != c) {
-                                        setChipStatus(c, false);
-                                    }
-                                    break;
+                mChip.setOnClickListener(view -> {
+                    if (null != checkIds && checkIds.size() >= 1) {
+                        for (int old_id : checkIds) {
+                            if (Chips.containsKey(old_id)) {
+                                Chip c = Chips.get(old_id);
+                                if (null != c) {
+                                    setChipStatus(c, false);
                                 }
+                                break;
                             }
                         }
-                        checkIds = new LinkedHashSet<>();
-                        checkIds.add(id);
-                        setChipStatus(mChip, true);
-
-                        if (null != mOnChipCheckListener)
-                            mOnChipCheckListener.onClick(PLChipGroup.this, id, text);
                     }
+                    checkIds = new LinkedHashSet<>();
+                    checkIds.add(id);
+                    setChipStatus(mChip, true);
+
+                    if (null != mOnChipCheckListener)
+                        mOnChipCheckListener.onClick(PLChipGroup.this, id, text);
                 });
             } else {
-                mChip.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                    @Override
-                    public void onCheckedChanged(CompoundButton compoundButton, boolean isCheck) {
-                        if (null == checkIds) {
-                            checkIds = new LinkedHashSet<>();
-                        }
-
-                        if (isCheck) {
-                            checkIds.add(id);
-                            if (null != mOnChipCheckListener)
-                                mOnChipCheckListener.onClick(PLChipGroup.this, id, text);
-                        } else {
-                            checkIds.remove(id);
-                        }
-
-                        setChipStatus(mChip, isCheck);
+                mChip.setOnCheckedChangeListener((compoundButton, isCheck) -> {
+                    if (null == checkIds) {
+                        checkIds = new LinkedHashSet<>();
                     }
+
+                    if (isCheck) {
+                        checkIds.add(id);
+                        if (null != mOnChipCheckListener)
+                            mOnChipCheckListener.onClick(PLChipGroup.this, id, text);
+                    } else {
+                        checkIds.remove(id);
+                    }
+
+                    setChipStatus(mChip, isCheck);
                 });
             }
         }

@@ -2,27 +2,26 @@
 buildscript {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
     dependencies {
-        classpath "com.android.tools.build:gradle:4.1.1"
+        classpath 'com.android.tools.build:gradle:4.2.1'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7.3'
     }
 }
 
 ext {
-    compileSdkVersion = 29
+    compileSdkVersion = 30
     minSdkVersion = 19
-    targetSdkVersion = 29
-    versionCode = 2008171
-    versionName = "1.0.4"
+    targetSdkVersion = 30
+    versionCode = 2105161
+    versionName = "1.0.5"
 }
 
 allprojects {
     repositories {
         google()
-        jcenter()
+        mavenCentral()
     }
 }
 

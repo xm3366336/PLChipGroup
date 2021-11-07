@@ -1,2 +1,3 @@
-include ':PLChipGroup'
+rootProject.name = "PLChipGroup"
+include ':Library'
 include ':app'

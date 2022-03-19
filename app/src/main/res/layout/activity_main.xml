@@ -73,4 +73,24 @@
         app:layout_constraintBottom_toTopOf="@id/btn_show"
         app:layout_constraintStart_toEndOf="@id/btn_show" />
 
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_dialog_choose_single"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dip"
+        android:text="Dialog单选"
+        android:textAllCaps="false"
+        app:layout_constraintBottom_toTopOf="@id/btn_choose_all"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_dialog_choose_multi"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dip"
+        android:text="Dialog多选"
+        android:textAllCaps="false"
+        app:layout_constraintStart_toEndOf="@id/btn_dialog_choose_single"
+        app:layout_constraintTop_toTopOf="@id/btn_dialog_choose_single" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

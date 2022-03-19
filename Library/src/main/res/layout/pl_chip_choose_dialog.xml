@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_main"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/plcg_default_bg"
+    android:orientation="vertical">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dip"
+        android:layout_marginTop="24dip"
+        android:layout_marginEnd="24dip"
+        android:textColor="@color/plcg_title_color"
+        android:textSize="@dimen/plcg_title_size"
+        android:textStyle="bold"
+        tools:text="这儿显示标题" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tv_title_sub"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_title"
+        android:layout_marginStart="24dip"
+        android:layout_marginEnd="24dip"
+        android:textColor="@color/plcg_desc_color"
+        android:textSize="@dimen/plcg_desc_size"
+        tools:text="这儿显示副标题" />
+
+    <com.pengl.PLChipGroup
+        android:id="@+id/mPLChipGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tv_title_sub"
+        android:layout_marginStart="8dip"
+        android:layout_marginTop="8dip"
+        android:layout_marginEnd="8dip"
+        android:paddingStart="8dip"
+        android:paddingTop="16dip"
+        android:paddingEnd="8dip"
+        android:paddingBottom="16dip"
+        app:chipSpacingHorizontal="8dip"
+        app:chipSpacingVertical="8dip"
+        app:plcg_height="22dip"
+        app:plcg_textSize="13dip" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_confirm"
+        android:layout_width="96dp"
+        android:layout_height="48dip"
+        android:layout_below="@+id/mPLChipGroup"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="16dip"
+        android:background="@drawable/btn_fixed"
+        android:gravity="center"
+        android:padding="8dp"
+        android:text="确定"
+        android:textColor="@android:color/white"
+        android:textSize="@dimen/plcg_btn_size" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_cancel"
+        android:layout_width="96dp"
+        android:layout_height="48dip"
+        android:layout_alignTop="@id/btn_confirm"
+        android:layout_toStartOf="@id/btn_confirm"
+        android:background="@drawable/list_selector"
+        android:gravity="center"
+        android:text="取消"
+        android:textColor="@color/plcg_desc_color"
+        android:textSize="@dimen/plcg_btn_size" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_reset"
+        android:layout_width="72dp"
+        android:layout_height="48dip"
+        android:layout_alignTop="@id/btn_confirm"
+        android:layout_alignParentStart="true"
+        android:background="@drawable/list_selector"
+        android:gravity="center"
+        android:text="重置"
+        android:textColor="@color/plcg_desc_color"
+        android:textSize="@dimen/plcg_btn_size"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+</RelativeLayout>

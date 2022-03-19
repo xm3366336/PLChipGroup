@@ -1,0 +1,7 @@
+<resources>
+
+    <dimen name="plcg_title_size">18dp</dimen>
+    <dimen name="plcg_desc_size">16dp</dimen>
+    <dimen name="plcg_btn_size">13dp</dimen>
+
+</resources>

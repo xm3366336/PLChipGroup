@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="plcg_default_bg">#f5f5f5</color>
+    <color name="plcg_edit_activated_color">#ea5c05</color>
+
+    <color name="plcg_divider">#D6D6D6</color>
+    <color name="plcg_colorPress">#E6E6E6</color>
+    <color name="plcg_colorPressTrans">#30E6E6E6</color>
+    <color name="plcg_colorGrey">#ffe1e1e1</color>
+
+    <color name="plcg_title_color">#ff3c3c3c</color>
+    <color name="plcg_desc_color">#ff737373</color>
+
+</resources>

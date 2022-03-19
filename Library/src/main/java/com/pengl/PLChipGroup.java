@@ -31,7 +31,7 @@ public class PLChipGroup extends FrameLayout {
 
     private final String TAG = PLChipGroup.class.getSimpleName();
 
-    private ChipGroup mChipGroup;
+    private final ChipGroup mChipGroup;
     private OnChipCheckListener mOnChipCheckListener;
 
     /**
@@ -39,9 +39,7 @@ public class PLChipGroup extends FrameLayout {
      */
     private int maxCount;
 
-    private final String _def_shrink_text = "显示更多";// 收缩时，显示的文字
     private final int _def_shrink_id = -10001;
-    private final String _def_expand_text = "折叠";// 展开时，显示的文字
     private final int _def_expand_id = -10002;
 
     private int mChipHeight;// Chip的高度
@@ -61,32 +59,28 @@ public class PLChipGroup extends FrameLayout {
     private int plcg_color_bg_un;
 
     /**
-     * 已选中的id
+     * 已选中的位置点
      */
-    private LinkedHashSet<Integer> checkIds = new LinkedHashSet<>();
+    private LinkedHashSet<Integer> checkPositionSet = new LinkedHashSet<>();
     /**
      * 所有的Chip的集合，key为id
      */
     private HashMap<Integer, Chip> Chips = new HashMap<>();
 
-    private String[] DATA;
+    //    private String[] DATA;
+    private List<BeanChipItems> DATA;
 
     public PLChipGroup(Context context) {
-        super(context);
-        init(null);
+        this(context, null);
     }
 
     public PLChipGroup(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        init(attrs);
+        this(context, attrs, 0);
     }
 
     public PLChipGroup(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(attrs);
-    }
 
-    public void init(AttributeSet attrs) {
         mChipGroup = new ChipGroup(getContext());
         addView(mChipGroup, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 
@@ -190,34 +184,84 @@ public class PLChipGroup extends FrameLayout {
     }
 
     /**
-     * 默认选中的ids
+     * 设置已选中的项
+     *
+     * @param checkPosition 已选中的项
+     */
+    public void setCheckPosition(int... checkPosition) {
+        if (null == checkPosition)
+            return;
+        if (null == DATA || DATA.size() <= 0) {
+            setLog("setCheckPosition");
+            return;
+        }
+        checkPositionSet = new LinkedHashSet<>();
+        for (int x : checkPosition) {
+            checkPositionSet.add(x);
+        }
+    }
+
+    /**
+     * 设置已选中的项
      *
      * @param defaultCheckIds 默认选中的id，多个以逗号分隔。默认0，即第1个
+     * @deprecated 请使用 setCheckPosition(checkPositions) 或 setCheckPosition(int... checkPosition)
      */
+    @Deprecated
     public void setDefaultCheckIds(String defaultCheckIds) {
-        if (null == DATA || DATA.length <= 0) {
-            Log.e(TAG + ".setDefaultCheckIds", "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            Log.e(TAG + ".setDefaultCheckIds", "!!!!!!!!请先调用.setData方法传入数据!!!!!!!!");
-            Log.e(TAG + ".setDefaultCheckIds", "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        setCheckPosition(defaultCheckIds);
+    }
+
+    /**
+     * 设置已选中的项
+     *
+     * @param checkPositions 默认选中的position，多个以逗号分隔。
+     */
+    public void setCheckPosition(String checkPositions) {
+        if (TextUtils.isEmpty(checkPositions)) {
+            return;
+        }
+        if (null == DATA || DATA.size() <= 0) {
+            setLog("setCheckPosition");
             return;
         }
 
-        checkIds = new LinkedHashSet<>();
-
-        if (TextUtils.isEmpty(defaultCheckIds)) {
-            checkIds.add(0);
-            return;
-        }
-
-        String[] items = defaultCheckIds.split(",");
+        checkPositionSet = new LinkedHashSet<>();
+        String[] items = checkPositions.split(",");
         for (String item : items) {
             int x = -1;
             try {
                 x = Integer.parseInt(item);
             } catch (Exception ignored) {
             }
-            if (x != -1 && x < DATA.length) {
-                checkIds.add(x);
+            if (x != -1 && x < DATA.size()) {
+                checkPositionSet.add(x);
+            }
+        }
+    }
+
+    /**
+     * 设置已选中的项
+     *
+     * @param checkDatas 选中的值，以值来反推position
+     */
+    public void setCheckDatas(String checkDatas) {
+        if (TextUtils.isEmpty(checkDatas))
+            return;
+        if (null == DATA || DATA.size() <= 0) {
+            setLog("setCheckDatas");
+            return;
+        }
+        checkPositionSet = new LinkedHashSet<>();
+        HashMap<Object, Integer> map = new HashMap<>();
+        int i = 0;
+        for (BeanChipItems bean : DATA) {
+            map.put(bean.getData(), i++);
+        }
+        String[] items = checkDatas.split(",");
+        for (String item : items) {
+            if (map.containsKey(item)) {
+                checkPositionSet.add(map.get(item));
             }
         }
     }
@@ -228,7 +272,27 @@ public class PLChipGroup extends FrameLayout {
      * @param data 数据
      */
     public void setData(String[] data) {
-        this.DATA = data;
+        this.DATA = new ArrayList<>();
+        for (String label : data) {
+            this.DATA.add(new BeanChipItems(label, null));
+        }
+    }
+
+    public void setData(ArrayList<BeanChipItems> items) {
+        DATA = new ArrayList<>();
+        DATA.addAll(items);
+    }
+
+    public void addData(BeanChipItems item) {
+        if (null == DATA)
+            DATA = new ArrayList<>();
+        DATA.add(item);
+    }
+
+    public void addDataAll(ArrayList<BeanChipItems> items) {
+        if (null == DATA)
+            DATA = new ArrayList<>();
+        DATA.addAll(items);
     }
 
     /**
@@ -243,7 +307,7 @@ public class PLChipGroup extends FrameLayout {
             setChipStatus(entry.getValue(), false);
         }
 
-        checkIds = new LinkedHashSet<>();
+        checkPositionSet = new LinkedHashSet<>();
         mChipGroup.clearCheck();
     }
 
@@ -259,8 +323,8 @@ public class PLChipGroup extends FrameLayout {
             return;
         }
 
-        checkIds = new LinkedHashSet<>();
-        boolean isNeedShowShrinkAndExpand = maxCount > 0 && maxCount < DATA.length;
+        checkPositionSet = new LinkedHashSet<>();
+        boolean isNeedShowShrinkAndExpand = maxCount > 0 && maxCount < DATA.size();
         if (isNeedShowShrinkAndExpand) {
             showExpand();
         }
@@ -270,7 +334,7 @@ public class PLChipGroup extends FrameLayout {
                 continue;
             }
             setChipStatus(entry.getValue(), true);
-            checkIds.add(entry.getKey());
+            checkPositionSet.add(entry.getKey());
         }
     }
 
@@ -305,7 +369,7 @@ public class PLChipGroup extends FrameLayout {
      * 显示，默认以收缩状态显示
      */
     public void show() {
-        if (null == DATA || DATA.length <= 0) {
+        if (null == DATA || DATA.size() <= 0) {
             Log.e(TAG + ".show", "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             Log.e(TAG + ".show", "!!!!!!!!请先调用.setData方法传入数据!!!!!!!!");
             Log.e(TAG + ".show", "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
@@ -321,22 +385,25 @@ public class PLChipGroup extends FrameLayout {
     private void showShrink() {
         // 是否显示收缩或展开的按钮
         // 只有在配置了最多显示项，以及最多显示项少于总数量的情况下，才需要
-        boolean isNeedShowShrinkAndExpand = maxCount > 0 && maxCount < DATA.length;
+        boolean isNeedShowShrinkAndExpand = maxCount > 0 && maxCount < DATA.size();
         int showRealCount;// 本次真实显示的量
 
         if (isNeedShowShrinkAndExpand) {
             showRealCount = maxCount;
         } else {
-            showRealCount = DATA.length;
+            showRealCount = DATA.size();
         }
 
         mChipGroup.removeAllViews();
         for (int i = 0; i < showRealCount; i++) {
-            mChipGroup.addView(createChip(i, DATA[i]), i, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            mChipGroup.addView(createChip(i, DATA.get(i).getLabel()), i,
+                    new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         }
 
+        // 收缩时，显示的文字
         if (isNeedShowShrinkAndExpand) {
-            mChipGroup.addView(createChip(_def_shrink_id, _def_shrink_text), showRealCount, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            mChipGroup.addView(createChip(_def_shrink_id, "显示更多"), showRealCount,
+                    new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         }
     }
 
@@ -345,13 +412,16 @@ public class PLChipGroup extends FrameLayout {
      */
     private void showExpand() {
         mChipGroup.removeAllViews();
-        for (int i = 0; i < DATA.length; i++) {
-            mChipGroup.addView(createChip(i, DATA[i]), i, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        int size = DATA.size();
+        for (int i = 0; i < size; i++) {
+            mChipGroup.addView(createChip(i, DATA.get(i).getLabel()), i,
+                    new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         }
 
-        boolean isNeedShowShrinkAndExpand = maxCount > 0 && maxCount < DATA.length;
+        boolean isNeedShowShrinkAndExpand = maxCount > 0 && maxCount < size;
         if (isNeedShowShrinkAndExpand) {
-            mChipGroup.addView(createChip(_def_expand_id, _def_expand_text), DATA.length, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+            mChipGroup.addView(createChip(_def_expand_id, "折叠"), size,
+                    new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         }
     }
 
@@ -364,7 +434,8 @@ public class PLChipGroup extends FrameLayout {
      */
     private Chip createChip(final int id, final String text) {
         final Chip mChip = new Chip(getContext());
-        ChipDrawable chipDrawable = ChipDrawable.createFromAttributes(getContext(), null, 0, R.style.Widget_MaterialComponents_Chip_Choice);
+        ChipDrawable chipDrawable = ChipDrawable.createFromAttributes(getContext(), null,
+                0, R.style.Widget_MaterialComponents_Chip_Choice);
         mChip.setChipDrawable(chipDrawable);
 
         mChip.setId(id);// id以位置记录
@@ -376,7 +447,7 @@ public class PLChipGroup extends FrameLayout {
         mChip.setChipMinHeight(mChipHeight);
         mChip.setChipStrokeWidth(dp2px(0.8f));
 
-        setChipStatus(mChip, checkIds.contains(id));
+        setChipStatus(mChip, checkPositionSet.contains(id));
 
         if (id == _def_shrink_id) {
             mChip.setCloseIconVisible(true);
@@ -391,8 +462,8 @@ public class PLChipGroup extends FrameLayout {
         } else {
             if (isSingleSelection()) {
                 mChip.setOnClickListener(view -> {
-                    if (null != checkIds && checkIds.size() >= 1) {
-                        for (int old_id : checkIds) {
+                    if (null != checkPositionSet && checkPositionSet.size() >= 1) {
+                        for (int old_id : checkPositionSet) {
                             if (Chips.containsKey(old_id)) {
                                 Chip c = Chips.get(old_id);
                                 if (null != c) {
@@ -402,8 +473,8 @@ public class PLChipGroup extends FrameLayout {
                             }
                         }
                     }
-                    checkIds = new LinkedHashSet<>();
-                    checkIds.add(id);
+                    checkPositionSet = new LinkedHashSet<>();
+                    checkPositionSet.add(id);
                     setChipStatus(mChip, true);
 
                     if (null != mOnChipCheckListener)
@@ -411,16 +482,16 @@ public class PLChipGroup extends FrameLayout {
                 });
             } else {
                 mChip.setOnCheckedChangeListener((compoundButton, isCheck) -> {
-                    if (null == checkIds) {
-                        checkIds = new LinkedHashSet<>();
+                    if (null == checkPositionSet) {
+                        checkPositionSet = new LinkedHashSet<>();
                     }
 
                     if (isCheck) {
-                        checkIds.add(id);
+                        checkPositionSet.add(id);
                         if (null != mOnChipCheckListener)
                             mOnChipCheckListener.onClick(PLChipGroup.this, id, text);
                     } else {
-                        checkIds.remove(id);
+                        checkPositionSet.remove(id);
                     }
 
                     setChipStatus(mChip, isCheck);
@@ -469,8 +540,8 @@ public class PLChipGroup extends FrameLayout {
      * @return 位置
      */
     public int getSingleSelectionPosition() {
-        if (null != checkIds && checkIds.size() > 0) {
-            return checkIds.iterator().next();
+        if (null != checkPositionSet && checkPositionSet.size() > 0) {
+            return checkPositionSet.iterator().next();
         } else {
             return -1;
         }
@@ -482,23 +553,34 @@ public class PLChipGroup extends FrameLayout {
      * @return list
      */
     public List<Integer> getCheckedPositions() {
-        if (null != checkIds && checkIds.size() > 0) {
-            return new ArrayList<>(checkIds);
+        if (null != checkPositionSet && checkPositionSet.size() > 0) {
+            return new ArrayList<>(checkPositionSet);
         } else {
             return new ArrayList<>();
         }
     }
 
     /**
-     * 显示选择的项
+     * 获取已选择项的label
+     *
+     * @return list列表
+     * @deprecated 使用 getCheckedLabel()
+     */
+    @Deprecated
+    public List<String> getCheckedValues() {
+        return getCheckedLabel();
+    }
+
+    /**
+     * 获取已选择项的label
      *
      * @return list列表
      */
-    public List<String> getCheckedValues() {
-        if (null != checkIds && checkIds.size() > 0) {
+    public List<String> getCheckedLabel() {
+        if (null != checkPositionSet && checkPositionSet.size() > 0) {
             List<String> list = new ArrayList<>();
-            for (int i : checkIds) {
-                list.add(DATA[i]);
+            for (int i : checkPositionSet) {
+                list.add(DATA.get(i).getLabel());
             }
             return list;
         } else {
@@ -507,15 +589,60 @@ public class PLChipGroup extends FrameLayout {
     }
 
     /**
-     * 显示选择的项，多个以逗号分隔
+     * 获取已选择项的data
+     *
+     * @return list
+     */
+    public List<Object> getCheckedData() {
+        if (null != checkPositionSet && checkPositionSet.size() > 0) {
+            List<Object> list = new ArrayList<>();
+            for (int i : checkPositionSet) {
+                list.add(DATA.get(i).getData());
+            }
+            return list;
+        } else {
+            return new ArrayList<>();
+        }
+    }
+
+    /**
+     * 获取已选择项的label，多个以逗号分隔
+     *
+     * @return 已选择的项
+     * @deprecated 使用 getCheckedLabelToString() 不容易误解
+     */
+    @Deprecated
+    public String getCheckedValuesToString() {
+        return getCheckedLabelToString();
+    }
+
+    /**
+     * 获取已选择项的label，多个以逗号分隔
      *
      * @return 已选择的项
      */
-    public String getCheckedValuesToString() {
-        if (null != checkIds && checkIds.size() > 0) {
+    public String getCheckedLabelToString() {
+        if (null != checkPositionSet && checkPositionSet.size() > 0) {
             StringBuilder buf = new StringBuilder();
-            for (int i : checkIds) {
-                buf.append(DATA[i]).append(",");
+            for (int i : checkPositionSet) {
+                buf.append(DATA.get(i).getLabel()).append(",");
+            }
+            return buf.substring(0, buf.length() - 1);
+        } else {
+            return "";
+        }
+    }
+
+    /**
+     * 获取已选择项的data，多个以逗号分隔
+     *
+     * @return 已选择的项
+     */
+    public String getCheckedDataToString() {
+        if (null != checkPositionSet && checkPositionSet.size() > 0) {
+            StringBuilder buf = new StringBuilder();
+            for (int i : checkPositionSet) {
+                buf.append(DATA.get(i).getData()).append(",");
             }
             return buf.substring(0, buf.length() - 1);
         } else {
@@ -526,5 +653,11 @@ public class PLChipGroup extends FrameLayout {
     public int dp2px(float dpValue) {
         final float scale = getContext().getResources().getDisplayMetrics().density;
         return (int) (dpValue * scale + 0.5f);
+    }
+
+    private void setLog(String tag) {
+        Log.w(TAG + "." + tag, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+        Log.w(TAG + "." + tag, "!!!!!!!!请先调用.setData方法传入数据!!!!!!!!!");
+        Log.w(TAG + "." + tag, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
     }
 }

@@ -1,3 +1,4 @@
 # PLChipGroup
+[![](https://jitpack.io/v/xm3366336/PLChipGroup.svg)](https://jitpack.io/#xm3366336/PLChipGroup)
 
-自个用的ChipGroup，后续再完善说明
+自个用的ChipGroup

@@ -39,8 +39,8 @@ public class PLChipGroup extends FrameLayout {
      */
     private int maxCount;
 
-    private final int _def_shrink_id = -10001;
-    private final int _def_expand_id = -10002;
+    private final int _def_shrink_position = -10001;
+    private final int _def_expand_position = -10002;
 
     private int mChipHeight;// Chip的高度
     private float mTextSize;// 字体大小
@@ -67,7 +67,6 @@ public class PLChipGroup extends FrameLayout {
      */
     private HashMap<Integer, Chip> Chips = new HashMap<>();
 
-    //    private String[] DATA;
     private List<BeanChipItems> DATA;
 
     public PLChipGroup(Context context) {
@@ -330,7 +329,7 @@ public class PLChipGroup extends FrameLayout {
         }
 
         for (Map.Entry<Integer, Chip> entry : Chips.entrySet()) {
-            if (entry.getKey() == _def_shrink_id || entry.getKey() == _def_expand_id) {
+            if (entry.getKey() == _def_shrink_position || entry.getKey() == _def_expand_position) {
                 continue;
             }
             setChipStatus(entry.getValue(), true);
@@ -370,9 +369,7 @@ public class PLChipGroup extends FrameLayout {
      */
     public void show() {
         if (null == DATA || DATA.size() <= 0) {
-            Log.e(TAG + ".show", "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
-            Log.e(TAG + ".show", "!!!!!!!!请先调用.setData方法传入数据!!!!!!!!");
-            Log.e(TAG + ".show", "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
+            setLog("show");
             return;
         }
 
@@ -396,13 +393,13 @@ public class PLChipGroup extends FrameLayout {
 
         mChipGroup.removeAllViews();
         for (int i = 0; i < showRealCount; i++) {
-            mChipGroup.addView(createChip(i, DATA.get(i).getLabel()), i,
+            mChipGroup.addView(createChip(i, DATA.get(i)), i,
                     new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         }
 
         // 收缩时，显示的文字
         if (isNeedShowShrinkAndExpand) {
-            mChipGroup.addView(createChip(_def_shrink_id, "显示更多"), showRealCount,
+            mChipGroup.addView(createChip(_def_shrink_position, null), showRealCount,
                     new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         }
     }
@@ -414,13 +411,13 @@ public class PLChipGroup extends FrameLayout {
         mChipGroup.removeAllViews();
         int size = DATA.size();
         for (int i = 0; i < size; i++) {
-            mChipGroup.addView(createChip(i, DATA.get(i).getLabel()), i,
+            mChipGroup.addView(createChip(i, DATA.get(i)), i,
                     new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         }
 
         boolean isNeedShowShrinkAndExpand = maxCount > 0 && maxCount < size;
         if (isNeedShowShrinkAndExpand) {
-            mChipGroup.addView(createChip(_def_expand_id, "折叠"), size,
+            mChipGroup.addView(createChip(_def_expand_position, null), size,
                     new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         }
     }
@@ -428,38 +425,40 @@ public class PLChipGroup extends FrameLayout {
     /**
      * 创建一个 Chip
      *
-     * @param id   id
-     * @param text 显示的文字
+     * @param position 第几个
+     * @param item     对象
      * @return Chip
      */
-    private Chip createChip(final int id, final String text) {
+    private Chip createChip(final int position, final BeanChipItems item) {
         final Chip mChip = new Chip(getContext());
         ChipDrawable chipDrawable = ChipDrawable.createFromAttributes(getContext(), null,
                 0, R.style.Widget_MaterialComponents_Chip_Choice);
         mChip.setChipDrawable(chipDrawable);
 
-        mChip.setId(id);// id以位置记录
-        mChip.setText(text);
+        mChip.setId(position);// 位置记录
+
         mChip.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTextSize);
         mChip.setPadding(dp2px(6), 0, dp2px(6), 0);
         mChip.setTextAlignment(TEXT_ALIGNMENT_CENTER);
         mChip.setShapeAppearanceModel(ShapeAppearanceModel.builder().setAllCornerSizes(mChipHeight / 2.0f).build());
         mChip.setChipMinHeight(mChipHeight);
         mChip.setChipStrokeWidth(dp2px(0.8f));
+        setChipStatus(mChip, checkPositionSet.contains(position));
 
-        setChipStatus(mChip, checkPositionSet.contains(id));
-
-        if (id == _def_shrink_id) {
+        if (position == _def_shrink_position) {
+            mChip.setText("显示更多");
             mChip.setCloseIconVisible(true);
             mChip.setCloseIconResource(R.drawable.ic_arrow_drop_down_24dp);
             mChip.setOnClickListener(view -> showExpand());
             mChip.setOnCloseIconClickListener(view -> showExpand());
-        } else if (id == _def_expand_id) {
+        } else if (position == _def_expand_position) {
+            mChip.setText("折叠");
             mChip.setCloseIconVisible(true);
             mChip.setCloseIconResource(R.drawable.ic_arrow_drop_up_24dp);
             mChip.setOnClickListener(view -> showShrink());
             mChip.setOnCloseIconClickListener(view -> showShrink());
         } else {
+            mChip.setText(item.getLabel());
             if (isSingleSelection()) {
                 mChip.setOnClickListener(view -> {
                     if (null != checkPositionSet && checkPositionSet.size() >= 1) {
@@ -474,27 +473,29 @@ public class PLChipGroup extends FrameLayout {
                         }
                     }
                     checkPositionSet = new LinkedHashSet<>();
-                    checkPositionSet.add(id);
+                    checkPositionSet.add(position);
                     setChipStatus(mChip, true);
 
                     if (null != mOnChipCheckListener)
-                        mOnChipCheckListener.onClick(PLChipGroup.this, id, text);
+                        mOnChipCheckListener.onClick(PLChipGroup.this, true, position, item);
                 });
             } else {
-                mChip.setOnCheckedChangeListener((compoundButton, isCheck) -> {
+                mChip.setOnClickListener(v -> {
                     if (null == checkPositionSet) {
                         checkPositionSet = new LinkedHashSet<>();
                     }
 
-                    if (isCheck) {
-                        checkPositionSet.add(id);
+                    if (checkPositionSet.contains(position)) {
+                        checkPositionSet.remove(position);
+                        setChipStatus(mChip, false);
                         if (null != mOnChipCheckListener)
-                            mOnChipCheckListener.onClick(PLChipGroup.this, id, text);
+                            mOnChipCheckListener.onClick(PLChipGroup.this, false, position, item);
                     } else {
-                        checkPositionSet.remove(id);
+                        checkPositionSet.add(position);
+                        setChipStatus(mChip, true);
+                        if (null != mOnChipCheckListener)
+                            mOnChipCheckListener.onClick(PLChipGroup.this, true, position, item);
                     }
-
-                    setChipStatus(mChip, isCheck);
                 });
             }
         }
@@ -502,7 +503,7 @@ public class PLChipGroup extends FrameLayout {
         if (null == Chips) {
             Chips = new HashMap<>();
         }
-        Chips.put(id, mChip);
+        Chips.put(position, mChip);
 
         return mChip;
     }

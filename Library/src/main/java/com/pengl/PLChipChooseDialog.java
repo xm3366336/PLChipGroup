@@ -88,7 +88,7 @@ public class PLChipChooseDialog extends BottomSheetDialog {
      */
     public PLChipChooseDialog setSingleClickClose(boolean isSingleClickClose) {
         if (isSingleClickClose) {
-            mPLChipGroup.setOnChipCheckListener((view, position, text) -> onClickOK());
+            mPLChipGroup.setOnChipCheckListener((view, isCheck, position, mBeanChipItems) -> onClickOK());
             btn_confirm.setVisibility(View.GONE);
             btn_cancel.setVisibility(View.GONE);
         } else {

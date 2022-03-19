@@ -34,8 +34,13 @@ public class MainActivity extends AppCompatActivity {
 
         mPLChipGroup = findViewById(R.id.mPLChipGroup1);
         mPLChipGroup.setData(items);
-        mPLChipGroup.setOnChipCheckListener((PLChipGroup view, int position, String text) ->
-                Toast.makeText(MainActivity.this, position + "\n" + text, Toast.LENGTH_SHORT).show());
+        mPLChipGroup.setOnChipCheckListener((view, isCheck, position, mBeanChipItems) -> {
+            if (isCheck) {
+                Toast.makeText(MainActivity.this, "选中：[" + position + "]" + mBeanChipItems.getLabel(), Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(MainActivity.this, "取消：[" + position + "]" + mBeanChipItems.getLabel(), Toast.LENGTH_SHORT).show();
+            }
+        });
         mPLChipGroup.show();
 
         ((MaterialCheckBox) findViewById(R.id.mCheckBox_single)).setOnCheckedChangeListener(

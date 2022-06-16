@@ -3,11 +3,13 @@ package com.pengl;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatTextView;
 
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.pengl.plchipgroup.R;
 
@@ -46,6 +48,15 @@ public class PLChipChooseDialog extends BottomSheetDialog {
                 return;
             mPLChipGroup.cleanAll();
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        BottomSheetBehavior<FrameLayout> behavior = getBehavior();
+        if (behavior.getState() != BottomSheetBehavior.STATE_EXPANDED)
+            behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
     private void onClickOK() {

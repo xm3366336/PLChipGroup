@@ -1,17 +1,16 @@
 package com.pengl.demo;
 
 import android.os.Bundle;
-import android.view.View;
 import android.widget.CompoundButton;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.pengl.BeanChipItems;
-import com.pengl.OnChipCheckListener;
 import com.pengl.PLChipChooseDialog;
 import com.pengl.PLChipGroup;
-
-import androidx.appcompat.app.AppCompatActivity;
+import com.pengl.plchipgroup.demo.R;
 
 import java.util.ArrayList;
 

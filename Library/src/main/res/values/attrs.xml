@@ -16,6 +16,15 @@
         <attr name="selectionRequired" format="boolean" />
 
         <!-- 以下自定义的 -->
+
+        <!-- 传入数据，以,分隔 -->
+        <attr name="plcg_data" format="string" />
+        <!-- 传入数据，默认选择的项，多项以,分隔 -->
+        <attr name="plcg_data_choose" format="string" />
+
+        <!-- 是否禁用选择事件，默认false -->
+        <attr name="plcg_disable" format="boolean" />
+
         <!-- 最多显示多少条，默认0，小于=0时，不限制。如果超过xx条，则显示：收缩和展开 -->
         <attr name="plcg_maxCount" format="integer" />
 

@@ -16,6 +16,7 @@
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:plcg_disable="false"
         app:plcg_height="24dip"
         app:plcg_maxCount="5"
         app:plcg_textSize="14dp"
@@ -33,6 +34,19 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/mPLChipGroup1" />
+
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/mCheckBox_disable"
+        android:layout_width="0dip"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dip"
+        android:layout_marginTop="8dip"
+        android:layout_marginEnd="16dip"
+        android:checked="false"
+        android:text="禁用"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/mCheckBox_single" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_show"
@@ -93,4 +107,12 @@
         app:layout_constraintStart_toEndOf="@id/btn_dialog_choose_single"
         app:layout_constraintTop_toTopOf="@id/btn_dialog_choose_single" />
 
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/tvLog"
+        android:layout_width="match_parent"
+        android:layout_height="0dip"
+        android:gravity="start|center_vertical"
+        android:padding="32dip"
+        app:layout_constraintBottom_toTopOf="@id/btn_dialog_choose_single"
+        app:layout_constraintTop_toBottomOf="@id/mCheckBox_disable" />
 </androidx.constraintlayout.widget.ConstraintLayout>

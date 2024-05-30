@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'maven-publish'
 
 android {
-    namespace "com.pengl.plchipgroup.demo"
+    namespace "com.pengl.demo"
     compileSdkVersion = rootProject.compileSdkVersion
 
     defaultConfig {
@@ -29,7 +29,7 @@ android {
 dependencies {
     implementation project(':Library')
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.appcompat:appcompat:1.7.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.google.android.material:material:1.12.0'
 }

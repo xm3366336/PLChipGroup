@@ -6,10 +6,11 @@ import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.CompoundButton;
 import android.widget.FrameLayout;
+
+import androidx.annotation.ColorRes;
+import androidx.annotation.Dimension;
 
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipDrawable;
@@ -22,10 +23,6 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-
-import androidx.annotation.ColorRes;
-import androidx.annotation.Dimension;
-import androidx.constraintlayout.widget.ConstraintLayout;
 
 public class PLChipGroup extends FrameLayout {
 
@@ -44,6 +41,7 @@ public class PLChipGroup extends FrameLayout {
 
     private int mChipHeight;// Chip的高度
     private float mTextSize;// 字体大小
+    private boolean isDisableCheck;// 是否禁用选择事件
 
     @ColorRes
     private int plcg_color_stroke;
@@ -80,11 +78,11 @@ public class PLChipGroup extends FrameLayout {
     public PLChipGroup(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
-        mChipGroup = new ChipGroup(getContext());
+        mChipGroup = new ChipGroup(context);
         addView(mChipGroup, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT));
 
-        if (null != attrs && null != getContext()) {
-            TypedArray a = getContext().obtainStyledAttributes(attrs, R.styleable.PLChipGroup);
+        if (null != attrs) {
+            TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.PLChipGroup);
 
             setChipHeight(a.getDimensionPixelSize(R.styleable.PLChipGroup_plcg_height, dp2px(24)));
             setChipSpacingHorizontal(a.getDimensionPixelOffset(R.styleable.PLChipGroup_chipSpacingHorizontal, 0));
@@ -102,12 +100,26 @@ public class PLChipGroup extends FrameLayout {
             setColorBg(a.getInt(R.styleable.PLChipGroup_plcg_color_stroke, R.color.plcg_default_color_bg));
             setColorBgUn(a.getInt(R.styleable.PLChipGroup_plcg_color_stroke_un, R.color.plcg_default_color_bg_un));
 
+            setDisableCheck(a.getBoolean(R.styleable.PLChipGroup_plcg_disable, false));
+            String data = a.getString(R.styleable.PLChipGroup_plcg_data);
+            if (!TextUtils.isEmpty(data)) {
+                setData(data.split(","));
+                String dataChoose = a.getString(R.styleable.PLChipGroup_plcg_data_choose);
+                if (!TextUtils.isEmpty(dataChoose)) {
+                    setCheckPosition(dataChoose);
+                }
+            }
+
             a.recycle();
         }
     }
 
     public void setChipHeight(@Dimension int height) {
         this.mChipHeight = height;
+    }
+
+    public void setDisableCheck(boolean isDisable) {
+        this.isDisableCheck = isDisable;
     }
 
     public void setChipSpacingHorizontal(@Dimension int chipSpacingHorizontal) {
@@ -190,7 +202,7 @@ public class PLChipGroup extends FrameLayout {
     public void setCheckPosition(int... checkPosition) {
         if (null == checkPosition)
             return;
-        if (null == DATA || DATA.size() <= 0) {
+        if (null == DATA || DATA.isEmpty()) {
             setLog("setCheckPosition");
             return;
         }
@@ -220,7 +232,7 @@ public class PLChipGroup extends FrameLayout {
         if (TextUtils.isEmpty(checkPositions)) {
             return;
         }
-        if (null == DATA || DATA.size() <= 0) {
+        if (null == DATA || DATA.isEmpty()) {
             setLog("setCheckPosition");
             return;
         }
@@ -247,7 +259,7 @@ public class PLChipGroup extends FrameLayout {
     public void setCheckDatas(String checkDatas) {
         if (TextUtils.isEmpty(checkDatas))
             return;
-        if (null == DATA || DATA.size() <= 0) {
+        if (null == DATA || DATA.isEmpty()) {
             setLog("setCheckDatas");
             return;
         }
@@ -432,7 +444,7 @@ public class PLChipGroup extends FrameLayout {
     private Chip createChip(final int position, final BeanChipItems item) {
         final Chip mChip = new Chip(getContext());
         ChipDrawable chipDrawable = ChipDrawable.createFromAttributes(getContext(), null,
-                0, R.style.Widget_MaterialComponents_Chip_Choice);
+                0, com.google.android.material.R.style.Widget_MaterialComponents_Chip_Choice);
         mChip.setChipDrawable(chipDrawable);
 
         mChip.setId(position);// 位置记录
@@ -461,40 +473,44 @@ public class PLChipGroup extends FrameLayout {
             mChip.setText(item.getLabel());
             if (isSingleSelection()) {
                 mChip.setOnClickListener(view -> {
-                    if (null != checkPositionSet && checkPositionSet.size() >= 1) {
-                        for (int old_id : checkPositionSet) {
-                            if (Chips.containsKey(old_id)) {
-                                Chip c = Chips.get(old_id);
-                                if (null != c) {
-                                    setChipStatus(c, false);
+                    if (!isDisableCheck) {
+                        if (null != checkPositionSet && !checkPositionSet.isEmpty()) {
+                            for (int old_id : checkPositionSet) {
+                                if (Chips.containsKey(old_id)) {
+                                    Chip c = Chips.get(old_id);
+                                    if (null != c) {
+                                        setChipStatus(c, false);
+                                    }
+                                    break;
                                 }
-                                break;
                             }
                         }
-                    }
-                    checkPositionSet = new LinkedHashSet<>();
-                    checkPositionSet.add(position);
-                    setChipStatus(mChip, true);
+                        checkPositionSet = new LinkedHashSet<>();
+                        checkPositionSet.add(position);
+                        setChipStatus(mChip, true);
 
-                    if (null != mOnChipCheckListener)
-                        mOnChipCheckListener.onClick(PLChipGroup.this, true, position, item);
+                        if (null != mOnChipCheckListener)
+                            mOnChipCheckListener.onClick(PLChipGroup.this, true, position, item);
+                    }
                 });
             } else {
                 mChip.setOnClickListener(v -> {
-                    if (null == checkPositionSet) {
-                        checkPositionSet = new LinkedHashSet<>();
-                    }
+                    if (!isDisableCheck) {
+                        if (null == checkPositionSet) {
+                            checkPositionSet = new LinkedHashSet<>();
+                        }
 
-                    if (checkPositionSet.contains(position)) {
-                        checkPositionSet.remove(position);
-                        setChipStatus(mChip, false);
-                        if (null != mOnChipCheckListener)
-                            mOnChipCheckListener.onClick(PLChipGroup.this, false, position, item);
-                    } else {
-                        checkPositionSet.add(position);
-                        setChipStatus(mChip, true);
-                        if (null != mOnChipCheckListener)
-                            mOnChipCheckListener.onClick(PLChipGroup.this, true, position, item);
+                        if (checkPositionSet.contains(position)) {
+                            checkPositionSet.remove(position);
+                            setChipStatus(mChip, false);
+                            if (null != mOnChipCheckListener)
+                                mOnChipCheckListener.onClick(PLChipGroup.this, false, position, item);
+                        } else {
+                            checkPositionSet.add(position);
+                            setChipStatus(mChip, true);
+                            if (null != mOnChipCheckListener)
+                                mOnChipCheckListener.onClick(PLChipGroup.this, true, position, item);
+                        }
                     }
                 });
             }
@@ -541,7 +557,7 @@ public class PLChipGroup extends FrameLayout {
      * @return 位置
      */
     public int getSingleSelectionPosition() {
-        if (null != checkPositionSet && checkPositionSet.size() > 0) {
+        if (null != checkPositionSet && !checkPositionSet.isEmpty()) {
             return checkPositionSet.iterator().next();
         } else {
             return -1;
@@ -554,7 +570,7 @@ public class PLChipGroup extends FrameLayout {
      * @return list
      */
     public List<Integer> getCheckedPositions() {
-        if (null != checkPositionSet && checkPositionSet.size() > 0) {
+        if (null != checkPositionSet && !checkPositionSet.isEmpty()) {
             return new ArrayList<>(checkPositionSet);
         } else {
             return new ArrayList<>();
@@ -578,7 +594,7 @@ public class PLChipGroup extends FrameLayout {
      * @return list列表
      */
     public List<String> getCheckedLabel() {
-        if (null != checkPositionSet && checkPositionSet.size() > 0) {
+        if (null != checkPositionSet && !checkPositionSet.isEmpty()) {
             List<String> list = new ArrayList<>();
             for (int i : checkPositionSet) {
                 list.add(DATA.get(i).getLabel());
@@ -595,7 +611,7 @@ public class PLChipGroup extends FrameLayout {
      * @return list
      */
     public List<Object> getCheckedData() {
-        if (null != checkPositionSet && checkPositionSet.size() > 0) {
+        if (null != checkPositionSet && !checkPositionSet.isEmpty()) {
             List<Object> list = new ArrayList<>();
             for (int i : checkPositionSet) {
                 list.add(DATA.get(i).getData());
@@ -623,7 +639,7 @@ public class PLChipGroup extends FrameLayout {
      * @return 已选择的项
      */
     public String getCheckedLabelToString() {
-        if (null != checkPositionSet && checkPositionSet.size() > 0) {
+        if (null != checkPositionSet && !checkPositionSet.isEmpty()) {
             StringBuilder buf = new StringBuilder();
             for (int i : checkPositionSet) {
                 buf.append(DATA.get(i).getLabel()).append(",");
@@ -640,7 +656,7 @@ public class PLChipGroup extends FrameLayout {
      * @return 已选择的项
      */
     public String getCheckedDataToString() {
-        if (null != checkPositionSet && checkPositionSet.size() > 0) {
+        if (null != checkPositionSet && !checkPositionSet.isEmpty()) {
             StringBuilder buf = new StringBuilder();
             for (int i : checkPositionSet) {
                 buf.append(DATA.get(i).getData()).append(",");

@@ -11,6 +11,9 @@ import androidx.appcompat.widget.AppCompatTextView;
 
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.google.android.material.imageview.ShapeableImageView;
+import com.google.android.material.shape.CornerFamily;
+import com.google.android.material.shape.ShapeAppearanceModel;
 import com.pengl.plchipgroup.R;
 
 import java.util.ArrayList;
@@ -20,6 +23,7 @@ public class PLChipChooseDialog extends BottomSheetDialog {
     private final AppCompatTextView tv_title, tv_title_sub;
     private final PLChipGroup mPLChipGroup;
     private final AppCompatButton btn_confirm, btn_cancel, btn_reset;
+    private final ShapeableImageView bg;
     private OnChipChooseListener mOnChipChooseListener;
 
     public interface OnChipChooseListener {
@@ -35,6 +39,7 @@ public class PLChipChooseDialog extends BottomSheetDialog {
         btn_confirm = findViewById(R.id.btn_confirm);
         btn_cancel = findViewById(R.id.btn_cancel);
         btn_reset = findViewById(R.id.btn_reset);
+        bg = findViewById(R.id.bg);
     }
 
     @Override
@@ -137,6 +142,23 @@ public class PLChipChooseDialog extends BottomSheetDialog {
     public PLChipChooseDialog setOnChipChooseListener(OnChipChooseListener mOnChipChooseListener) {
         this.mOnChipChooseListener = mOnChipChooseListener;
         return this;
+    }
+
+    /**
+     * 设置圆角的大小
+     *
+     * @param cornerSizeDip 默认是4dip，单位dip
+     */
+    public PLChipChooseDialog setBgRounded(int cornerSizeDip) {
+        bg.setShapeAppearanceModel(ShapeAppearanceModel.builder()
+                .setTopLeftCorner(CornerFamily.ROUNDED, Math.max(cornerSizeDip, 0))
+                .setTopRightCorner(CornerFamily.ROUNDED, Math.max(cornerSizeDip, 0))
+                .build());
+        return this;
+    }
+
+    public ShapeableImageView getBg() {
+        return bg;
     }
 
     @Override

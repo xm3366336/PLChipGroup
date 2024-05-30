@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout_main"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:background="@color/plcg_default_bg"
-    android:orientation="vertical">
+    android:layout_height="wrap_content">
+
+    <com.google.android.material.imageview.ShapeableImageView
+        android:id="@+id/bg"
+        android:layout_width="0dip"
+        android:layout_height="0dip"
+        android:background="@color/plcg_default_bg"
+        app:layout_constraintBottom_toBottomOf="@id/space1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_title"
@@ -18,24 +26,24 @@
         android:textColor="@color/plcg_title_color"
         android:textSize="@dimen/plcg_title_size"
         android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
         tools:text="这儿显示标题" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/tv_title_sub"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_title"
         android:layout_marginStart="24dip"
         android:layout_marginEnd="24dip"
         android:textColor="@color/plcg_desc_color"
         android:textSize="@dimen/plcg_desc_size"
+        app:layout_constraintTop_toBottomOf="@id/tv_title"
         tools:text="这儿显示副标题" />
 
     <com.pengl.PLChipGroup
         android:id="@+id/mPLChipGroup"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/tv_title_sub"
         android:layout_marginStart="8dip"
         android:layout_marginTop="8dip"
         android:layout_marginEnd="8dip"
@@ -45,6 +53,7 @@
         android:paddingBottom="16dip"
         app:chipSpacingHorizontal="8dip"
         app:chipSpacingVertical="8dip"
+        app:layout_constraintTop_toBottomOf="@id/tv_title_sub"
         app:plcg_height="22dip"
         app:plcg_textSize="13dip" />
 
@@ -52,40 +61,47 @@
         android:id="@+id/btn_confirm"
         android:layout_width="96dp"
         android:layout_height="48dip"
-        android:layout_below="@+id/mPLChipGroup"
-        android:layout_alignParentEnd="true"
-        android:layout_margin="16dip"
+        android:layout_marginStart="16dip"
+        android:layout_marginEnd="16dip"
         android:background="@drawable/btn_fixed"
         android:gravity="center"
         android:padding="8dp"
         android:text="确定"
         android:textColor="@android:color/white"
-        android:textSize="@dimen/plcg_btn_size" />
+        android:textSize="@dimen/plcg_btn_size"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/mPLChipGroup" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_cancel"
         android:layout_width="96dp"
         android:layout_height="48dip"
-        android:layout_alignTop="@id/btn_confirm"
-        android:layout_toStartOf="@id/btn_confirm"
         android:background="@drawable/list_selector"
         android:gravity="center"
         android:text="取消"
         android:textColor="@color/plcg_desc_color"
-        android:textSize="@dimen/plcg_btn_size" />
+        android:textSize="@dimen/plcg_btn_size"
+        app:layout_constraintEnd_toStartOf="@id/btn_confirm"
+        app:layout_constraintTop_toTopOf="@id/btn_confirm" />
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_reset"
         android:layout_width="72dp"
         android:layout_height="48dip"
-        android:layout_alignTop="@id/btn_confirm"
-        android:layout_alignParentStart="true"
+        android:layout_marginStart="16dip"
         android:background="@drawable/list_selector"
         android:gravity="center"
         android:text="重置"
         android:textColor="@color/plcg_desc_color"
         android:textSize="@dimen/plcg_btn_size"
         android:visibility="gone"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@id/btn_confirm"
         tools:visibility="visible" />
 
-</RelativeLayout>
+    <Space
+        android:id="@+id/space1"
+        android:layout_width="match_parent"
+        android:layout_height="16dip"
+        app:layout_constraintTop_toBottomOf="@id/btn_confirm" />
+</androidx.constraintlayout.widget.ConstraintLayout>

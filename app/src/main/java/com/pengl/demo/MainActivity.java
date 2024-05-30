@@ -2,15 +2,14 @@ package com.pengl.demo;
 
 import android.os.Bundle;
 import android.widget.CompoundButton;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatTextView;
 
 import com.google.android.material.checkbox.MaterialCheckBox;
 import com.pengl.BeanChipItems;
 import com.pengl.PLChipChooseDialog;
 import com.pengl.PLChipGroup;
-import com.pengl.plchipgroup.demo.R;
 
 import java.util.ArrayList;
 
@@ -19,11 +18,12 @@ public class MainActivity extends AppCompatActivity {
     private final String[] items = new String[]{
             "陈赫", "陈坤", "邓超", "特雷-杨", "肯巴-沃克", "吉安尼斯-安特托孔波", "西亚卡姆", "乔尔-恩比德",
             "杜淳", "冯绍峰", "韩庚", "胡歌", "何炅", "黄渤", "黄晓明", "贾乃亮", "李晨",
-            "李易峰李易峰李易峰李易峰李易峰李易峰李易峰李易峰李易峰李易峰李易峰李易峰李易峰李易峰李易峰李易峰李易峰",
+            "李易峰李易峰李易峰李易峰李易峰李易峰李易峰李易峰李易峰李易峰李易峰李易峰李易峰李易峰李易峰李易峰ABC",
             "鹿晗", "井柏然", "刘烨", "陆毅"};
 
 
     private PLChipGroup mPLChipGroup;
+    private AppCompatTextView tvLog;
     private String checkDatasByDialog;// 已选择的项
 
     @Override
@@ -31,13 +31,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        tvLog = findViewById(R.id.tvLog);
         mPLChipGroup = findViewById(R.id.mPLChipGroup1);
         mPLChipGroup.setData(items);
         mPLChipGroup.setOnChipCheckListener((view, isCheck, position, mBeanChipItems) -> {
             if (isCheck) {
-                Toast.makeText(MainActivity.this, "选中：[" + position + "]" + mBeanChipItems.getLabel(), Toast.LENGTH_SHORT).show();
+                tvLog.setText("选中：[" + position + "]" + mBeanChipItems.getLabel());
             } else {
-                Toast.makeText(MainActivity.this, "取消：[" + position + "]" + mBeanChipItems.getLabel(), Toast.LENGTH_SHORT).show();
+                tvLog.setText("取消：[" + position + "]" + mBeanChipItems.getLabel());
             }
         });
         mPLChipGroup.show();
@@ -48,9 +49,10 @@ public class MainActivity extends AppCompatActivity {
                     mPLChipGroup.show();
                 });
 
-        findViewById(R.id.btn_show).setOnClickListener(view ->
-                Toast.makeText(MainActivity.this, mPLChipGroup.getCheckedLabelToString(), Toast.LENGTH_LONG).show());
+        ((MaterialCheckBox) findViewById(R.id.mCheckBox_disable)).setOnCheckedChangeListener(
+                (CompoundButton compoundButton, boolean b) -> mPLChipGroup.setDisableCheck(b));
 
+        findViewById(R.id.btn_show).setOnClickListener(view -> tvLog.setText(mPLChipGroup.getCheckedLabelToString()));
         findViewById(R.id.btn_choose_all).setOnClickListener(v -> mPLChipGroup.setChooseAll());
         findViewById(R.id.btn_clean_all).setOnClickListener(v -> mPLChipGroup.cleanAll());
         findViewById(R.id.btn_clean_id).setOnClickListener(v -> mPLChipGroup.setChoose(0, false));
@@ -68,11 +70,12 @@ public class MainActivity extends AppCompatActivity {
                     .setTitleSub("这是单选")
                     .setSingleSelection(true)
                     .setSingleClickClose(true)
+                    .setBgRounded(16)
                     .setItems(listData)
                     .setCheckDatas(checkDatasByDialog)
                     .setOnChipChooseListener((checkLabels, checkDatas) -> {
                         checkDatasByDialog = checkDatas;
-                        Toast.makeText(MainActivity.this, checkDatasByDialog, Toast.LENGTH_SHORT).show();
+                        tvLog.setText(checkDatasByDialog);
                     }).show();
         });
 
@@ -81,11 +84,12 @@ public class MainActivity extends AppCompatActivity {
                     .setTitle("选择一项")
                     .setTitleSub("这是多选")
                     .setSingleSelection(false)
+                    .setBgRounded(16)
                     .setItems(listData)
                     .setCheckDatas(checkDatasByDialog)
                     .setOnChipChooseListener((checkLabels, checkDatas) -> {
                         checkDatasByDialog = checkDatas;
-                        Toast.makeText(MainActivity.this, checkDatasByDialog, Toast.LENGTH_SHORT).show();
+                        tvLog.setText(checkDatasByDialog);
                     }).show();
         });
     }

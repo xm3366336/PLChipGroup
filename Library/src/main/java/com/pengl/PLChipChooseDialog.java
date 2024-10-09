@@ -2,6 +2,7 @@ package com.pengl;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.FrameLayout;
 
@@ -31,8 +32,8 @@ public class PLChipChooseDialog extends BottomSheetDialog {
     }
 
     public PLChipChooseDialog(@NonNull Context context) {
-        super(context);
-        setContentView(R.layout.pl_chip_choose_dialog);
+        super(context, R.style.PLCG_Dialog);
+        setContentView(R.layout.plcg_choose_dialog);
         tv_title = findViewById(R.id.tv_title);
         tv_title_sub = findViewById(R.id.tv_title_sub);
         mPLChipGroup = findViewById(R.id.mPLChipGroup);
@@ -40,6 +41,7 @@ public class PLChipChooseDialog extends BottomSheetDialog {
         btn_cancel = findViewById(R.id.btn_cancel);
         btn_reset = findViewById(R.id.btn_reset);
         bg = findViewById(R.id.bg);
+        setBgRounded(8);
     }
 
     @Override
@@ -150,9 +152,11 @@ public class PLChipChooseDialog extends BottomSheetDialog {
      * @param cornerSizeDip 默认是4dip，单位dip
      */
     public PLChipChooseDialog setBgRounded(int cornerSizeDip) {
+        float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, cornerSizeDip,
+                getContext().getResources().getDisplayMetrics());
         bg.setShapeAppearanceModel(ShapeAppearanceModel.builder()
-                .setTopLeftCorner(CornerFamily.ROUNDED, Math.max(cornerSizeDip, 0))
-                .setTopRightCorner(CornerFamily.ROUNDED, Math.max(cornerSizeDip, 0))
+                .setTopLeftCorner(CornerFamily.ROUNDED, Math.max(px, 0))
+                .setTopRightCorner(CornerFamily.ROUNDED, Math.max(px, 0))
                 .build());
         return this;
     }

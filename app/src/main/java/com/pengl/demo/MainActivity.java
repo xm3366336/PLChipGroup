@@ -70,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
                     .setTitleSub("这是单选")
                     .setSingleSelection(true)
                     .setSingleClickClose(true)
-                    .setBgRounded(16)
                     .setItems(listData)
                     .setCheckDatas(checkDatasByDialog)
                     .setOnChipChooseListener((checkLabels, checkDatas) -> {

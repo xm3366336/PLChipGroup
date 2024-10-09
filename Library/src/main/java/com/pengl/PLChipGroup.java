@@ -380,7 +380,7 @@ public class PLChipGroup extends FrameLayout {
      * 显示，默认以收缩状态显示
      */
     public void show() {
-        if (null == DATA || DATA.size() <= 0) {
+        if (null == DATA || DATA.isEmpty()) {
             setLog("show");
             return;
         }

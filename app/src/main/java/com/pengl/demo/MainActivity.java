@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private PLChipGroup mPLChipGroup;
     private AppCompatTextView tvLog;
     private String checkDatasByDialog;// 已选择的项
+    private MaterialCheckBox mCheckBox_dialog_style;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +52,7 @@ public class MainActivity extends AppCompatActivity {
 
         ((MaterialCheckBox) findViewById(R.id.mCheckBox_disable)).setOnCheckedChangeListener(
                 (CompoundButton compoundButton, boolean b) -> mPLChipGroup.setDisableCheck(b));
+        mCheckBox_dialog_style = findViewById(R.id.mCheckBox_dialog_style);
 
         findViewById(R.id.btn_show).setOnClickListener(view -> tvLog.setText(mPLChipGroup.getCheckedLabelToString()));
         findViewById(R.id.btn_choose_all).setOnClickListener(v -> mPLChipGroup.setChooseAll());
@@ -65,7 +67,8 @@ public class MainActivity extends AppCompatActivity {
         }
 
         findViewById(R.id.btn_dialog_choose_single).setOnClickListener(v -> {
-            new PLChipChooseDialog(this)
+            new PLChipChooseDialog(this, mCheckBox_dialog_style.isChecked()
+                    ? PLChipChooseDialog.ShowType.center : PLChipChooseDialog.ShowType.bottom)
                     .setTitle("选择一项")
                     .setTitleSub("这是单选")
                     .setSingleSelection(true)
@@ -79,11 +82,12 @@ public class MainActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.btn_dialog_choose_multi).setOnClickListener(v -> {
-            new PLChipChooseDialog(this)
+            new PLChipChooseDialog(this, mCheckBox_dialog_style.isChecked()
+                    ? PLChipChooseDialog.ShowType.center : PLChipChooseDialog.ShowType.bottom)
                     .setTitle("选择一项")
                     .setTitleSub("这是多选")
                     .setSingleSelection(false)
-                    .setBgRounded(16)
+                    .setBgRounded(true, 16)
                     .setItems(listData)
                     .setCheckDatas(checkDatasByDialog)
                     .setOnChipChooseListener((checkLabels, checkDatas) -> {

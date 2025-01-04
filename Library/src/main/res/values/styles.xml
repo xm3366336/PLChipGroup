@@ -9,4 +9,9 @@
         <item name="android:windowActionBar">false</item>
     </style>
 
+    <style name="PLCG_AnimBottomIn" parent="@android:style/Animation.Dialog">
+        <item name="android:windowEnterAnimation">@anim/push_enter</item>
+        <item name="android:windowExitAnimation">@anim/push_exit</item>
+    </style>
+
 </resources>

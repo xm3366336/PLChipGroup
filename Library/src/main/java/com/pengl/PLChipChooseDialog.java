@@ -1,17 +1,19 @@
 package com.pengl;
 
+import android.app.Dialog;
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.View;
-import android.widget.FrameLayout;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatTextView;
 
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.imageview.ShapeableImageView;
 import com.google.android.material.shape.CornerFamily;
 import com.google.android.material.shape.ShapeAppearanceModel;
@@ -19,7 +21,7 @@ import com.pengl.plchipgroup.R;
 
 import java.util.ArrayList;
 
-public class PLChipChooseDialog extends BottomSheetDialog {
+public class PLChipChooseDialog extends Dialog {
 
     private final AppCompatTextView tv_title, tv_title_sub;
     private final PLChipGroup mPLChipGroup;
@@ -27,12 +29,23 @@ public class PLChipChooseDialog extends BottomSheetDialog {
     private final ShapeableImageView bg;
     private OnChipChooseListener mOnChipChooseListener;
 
+    private final ShowType showType;
+
+    public enum ShowType {
+        bottom, center
+    }
+
     public interface OnChipChooseListener {
         void onChipClickOK(String checkLabels, String checkDatas);
     }
 
     public PLChipChooseDialog(@NonNull Context context) {
+        this(context, ShowType.bottom);
+    }
+
+    public PLChipChooseDialog(@NonNull Context context, ShowType showType) {
         super(context, R.style.PLCG_Dialog);
+        this.showType = showType;
         setContentView(R.layout.plcg_choose_dialog);
         tv_title = findViewById(R.id.tv_title);
         tv_title_sub = findViewById(R.id.tv_title_sub);
@@ -41,12 +54,26 @@ public class PLChipChooseDialog extends BottomSheetDialog {
         btn_cancel = findViewById(R.id.btn_cancel);
         btn_reset = findViewById(R.id.btn_reset);
         bg = findViewById(R.id.bg);
-        setBgRounded(8);
+        setBgRounded(false, context.getResources().getDimensionPixelSize(R.dimen.plcg_dp_8));
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (showType == ShowType.center) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.N && null != getWindow()) {
+                getWindow().setLayout(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+                getWindow().setGravity(Gravity.CENTER);
+            }
+        } else {// 默认底部
+            WindowManager.LayoutParams lp = getWindow().getAttributes();
+            lp.width = ViewGroup.LayoutParams.MATCH_PARENT;
+            lp.height = ViewGroup.LayoutParams.WRAP_CONTENT;
+            lp.gravity = Gravity.BOTTOM;
+            getWindow().setAttributes(lp);
+            getWindow().setWindowAnimations(R.style.PLCG_AnimBottomIn);
+        }
 
         btn_confirm.setOnClickListener(v -> onClickOK());
         btn_cancel.setOnClickListener(v -> dismiss());
@@ -55,15 +82,6 @@ public class PLChipChooseDialog extends BottomSheetDialog {
                 return;
             mPLChipGroup.cleanAll();
         });
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-
-        BottomSheetBehavior<FrameLayout> behavior = getBehavior();
-        if (behavior.getState() != BottomSheetBehavior.STATE_EXPANDED)
-            behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
     }
 
     private void onClickOK() {
@@ -149,15 +167,22 @@ public class PLChipChooseDialog extends BottomSheetDialog {
     /**
      * 设置圆角的大小
      *
-     * @param cornerSizeDip 默认是4dip，单位dip
+     * @param isDip      是否为dip
+     * @param cornerSize 默认是4dip，单位dip
      */
-    public PLChipChooseDialog setBgRounded(int cornerSizeDip) {
-        float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, cornerSizeDip,
+    public PLChipChooseDialog setBgRounded(boolean isDip, int cornerSize) {
+        float px = TypedValue.applyDimension(isDip ? TypedValue.COMPLEX_UNIT_DIP : TypedValue.COMPLEX_UNIT_PX, cornerSize,
                 getContext().getResources().getDisplayMetrics());
-        bg.setShapeAppearanceModel(ShapeAppearanceModel.builder()
-                .setTopLeftCorner(CornerFamily.ROUNDED, Math.max(px, 0))
-                .setTopRightCorner(CornerFamily.ROUNDED, Math.max(px, 0))
-                .build());
+        if (showType == ShowType.center) {
+            bg.setShapeAppearanceModel(ShapeAppearanceModel.builder()
+                    .setAllCorners(CornerFamily.ROUNDED, Math.max(px, 0))
+                    .build());
+        } else {
+            bg.setShapeAppearanceModel(ShapeAppearanceModel.builder()
+                    .setTopLeftCorner(CornerFamily.ROUNDED, Math.max(px, 0))
+                    .setTopRightCorner(CornerFamily.ROUNDED, Math.max(px, 0))
+                    .build());
+        }
         return this;
     }
 

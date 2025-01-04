@@ -1,6 +1,7 @@
 package com.pengl;
 
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.content.res.TypedArray;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -9,7 +10,7 @@ import android.util.TypedValue;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 
-import androidx.annotation.ColorRes;
+import androidx.annotation.ColorInt;
 import androidx.annotation.Dimension;
 
 import com.google.android.material.chip.Chip;
@@ -43,17 +44,17 @@ public class PLChipGroup extends FrameLayout {
     private float mTextSize;// 字体大小
     private boolean isDisableCheck;// 是否禁用选择事件
 
-    @ColorRes
+    @ColorInt
     private int plcg_color_stroke;
-    @ColorRes
+    @ColorInt
     private int plcg_color_stroke_un;
-    @ColorRes
+    @ColorInt
     private int plcg_color_text;
-    @ColorRes
+    @ColorInt
     private int plcg_color_text_un;
-    @ColorRes
+    @ColorInt
     private int plcg_color_bg;
-    @ColorRes
+    @ColorInt
     private int plcg_color_bg_un;
 
     /**
@@ -93,12 +94,12 @@ public class PLChipGroup extends FrameLayout {
             setMaxCount(a.getInteger(R.styleable.PLChipGroup_plcg_maxCount, -1));
             setTextSize(a.getDimension(R.styleable.PLChipGroup_plcg_textSize, dp2px(12)));
 
-            setColorStroke(a.getInt(R.styleable.PLChipGroup_plcg_color_stroke, R.color.plcg_default_color_stroke));
-            setColorStrokeUn(a.getInt(R.styleable.PLChipGroup_plcg_color_stroke_un, R.color.plcg_default_color_stroke_un));
-            setColorText(a.getInt(R.styleable.PLChipGroup_plcg_color_stroke, R.color.plcg_default_color_text));
-            setColorTextUn(a.getInt(R.styleable.PLChipGroup_plcg_color_stroke_un, R.color.plcg_default_color_text_un));
-            setColorBg(a.getInt(R.styleable.PLChipGroup_plcg_color_stroke, R.color.plcg_default_color_bg));
-            setColorBgUn(a.getInt(R.styleable.PLChipGroup_plcg_color_stroke_un, R.color.plcg_default_color_bg_un));
+            setColorStroke(a.getColor(R.styleable.PLChipGroup_plcg_color_stroke, getResources().getColor(R.color.plcg_default_color_stroke)));
+            setColorStrokeUn(a.getColor(R.styleable.PLChipGroup_plcg_color_stroke_un, getResources().getColor(R.color.plcg_default_color_stroke_un)));
+            setColorText(a.getColor(R.styleable.PLChipGroup_plcg_color_stroke, getResources().getColor(R.color.plcg_default_color_text)));
+            setColorTextUn(a.getColor(R.styleable.PLChipGroup_plcg_color_stroke_un, getResources().getColor(R.color.plcg_default_color_text_un)));
+            setColorBg(a.getColor(R.styleable.PLChipGroup_plcg_color_stroke, getResources().getColor(R.color.plcg_default_color_bg)));
+            setColorBgUn(a.getColor(R.styleable.PLChipGroup_plcg_color_stroke_un, getResources().getColor(R.color.plcg_default_color_bg_un)));
 
             setDisableCheck(a.getBoolean(R.styleable.PLChipGroup_plcg_disable, false));
             String data = a.getString(R.styleable.PLChipGroup_plcg_data);
@@ -111,7 +112,17 @@ public class PLChipGroup extends FrameLayout {
             }
 
             a.recycle();
+        } else {
+            setColorStroke(getResources().getColor(R.color.plcg_default_color_stroke));
+            setColorStrokeUn(getResources().getColor(R.color.plcg_default_color_stroke_un));
+            setColorText(getResources().getColor(R.color.plcg_default_color_text));
+            setColorTextUn(getResources().getColor(R.color.plcg_default_color_text_un));
+            setColorBg(getResources().getColor(R.color.plcg_default_color_bg));
+            setColorBgUn(getResources().getColor(R.color.plcg_default_color_bg_un));
         }
+
+        if (null != DATA && !DATA.isEmpty())
+            show();
     }
 
     public void setChipHeight(@Dimension int height) {
@@ -170,27 +181,27 @@ public class PLChipGroup extends FrameLayout {
         this.mTextSize = textSize;
     }
 
-    public void setColorStroke(@ColorRes int plcg_color_stroke) {
+    public void setColorStroke(@ColorInt int plcg_color_stroke) {
         this.plcg_color_stroke = plcg_color_stroke;
     }
 
-    public void setColorStrokeUn(@ColorRes int plcg_color_stroke_un) {
+    public void setColorStrokeUn(@ColorInt int plcg_color_stroke_un) {
         this.plcg_color_stroke_un = plcg_color_stroke_un;
     }
 
-    public void setColorText(@ColorRes int plcg_color_text) {
+    public void setColorText(@ColorInt int plcg_color_text) {
         this.plcg_color_text = plcg_color_text;
     }
 
-    public void setColorTextUn(@ColorRes int plcg_color_text_un) {
+    public void setColorTextUn(@ColorInt int plcg_color_text_un) {
         this.plcg_color_text_un = plcg_color_text_un;
     }
 
-    public void setColorBg(@ColorRes int plcg_color_bg) {
+    public void setColorBg(@ColorInt int plcg_color_bg) {
         this.plcg_color_bg = plcg_color_bg;
     }
 
-    public void setColorBgUn(@ColorRes int plcg_color_bg_un) {
+    public void setColorBgUn(@ColorInt int plcg_color_bg_un) {
         this.plcg_color_bg_un = plcg_color_bg_un;
     }
 
@@ -365,6 +376,7 @@ public class PLChipGroup extends FrameLayout {
         }
 
         setChipStatus(Chips.get(position), isCheck);
+        checkPositionSet.remove(position);
     }
 
     /**
@@ -532,13 +544,13 @@ public class PLChipGroup extends FrameLayout {
      */
     private void setChipStatus(Chip mChip, boolean isCheckable) {
         if (isCheckable) {
-            mChip.setTextColor(getResources().getColor(plcg_color_text));
-            mChip.setChipBackgroundColorResource(plcg_color_bg);
-            mChip.setChipStrokeColorResource(plcg_color_stroke);
+            mChip.setTextColor(plcg_color_text);
+            mChip.setChipBackgroundColor(ColorStateList.valueOf(plcg_color_bg));
+            mChip.setChipStrokeColor(ColorStateList.valueOf(plcg_color_stroke));
         } else {
-            mChip.setTextColor(getResources().getColor(plcg_color_text_un));
-            mChip.setChipBackgroundColorResource(plcg_color_bg_un);
-            mChip.setChipStrokeColorResource(plcg_color_stroke_un);
+            mChip.setTextColor(plcg_color_text_un);
+            mChip.setChipBackgroundColor(ColorStateList.valueOf(plcg_color_bg_un));
+            mChip.setChipStrokeColor(ColorStateList.valueOf(plcg_color_stroke_un));
         }
     }
 
@@ -620,17 +632,6 @@ public class PLChipGroup extends FrameLayout {
         } else {
             return new ArrayList<>();
         }
-    }
-
-    /**
-     * 获取已选择项的label，多个以逗号分隔
-     *
-     * @return 已选择的项
-     * @deprecated 使用 getCheckedLabelToString() 不容易误解
-     */
-    @Deprecated
-    public String getCheckedValuesToString() {
-        return getCheckedLabelToString();
     }
 
     /**
